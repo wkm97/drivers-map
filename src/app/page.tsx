@@ -1,35 +1,29 @@
 'use client'
-import Map, { Marker, Popup } from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+
 import { useEffect, useState } from 'react';
+import Map, { Layer, Marker, Popup, Source } from 'react-map-gl';
+import colors from "tailwindcss/colors";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCarSide } from '@fortawesome/free-solid-svg-icons';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
 import { ControlPanel } from '@/components/control-panel';
+import { parseSource, pathLayer } from '@/components/layers';
+import { Driver, Drivers } from '@/index';
 
-const initialCoordinates = [37.394, 127.110]
-interface Driver {
-  driver_id: string
-  location: {
-    latitude: number
-    longitude: number
-    bearing: number
-  }
-}
-
-interface Drivers {
-  pickup_eta: number
-  drivers: Driver[]
-}
+const initialCoordinates = [127.110, 37.394]
 
 export default function Home() {
 
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [count, setCount] = useState(1)
-  const [popupInfo, setPopupInfo] = useState<Driver | null>(null);
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
 
   useEffect(() => {
     const fetchDriver = async () => {
       const params = new URLSearchParams({
-        latitude: initialCoordinates[0].toString(),
-        longitude: initialCoordinates[1].toString(),
+        longitude: initialCoordinates[0].toString(),
+        latitude: initialCoordinates[1].toString(),
         count: count.toString()
       });
       const response = await fetch(`/api/drivers?${params}`)
@@ -39,50 +33,65 @@ export default function Home() {
     fetchDriver().then(data => setDrivers(data.drivers))
   }, [count])
 
+
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <Map
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         initialViewState={{
-          latitude: initialCoordinates[0],
-          longitude: initialCoordinates[1],
+          longitude: initialCoordinates[0],
+          latitude: initialCoordinates[1],
           zoom: 15
         }}
         dragRotate={false}
         mapStyle="mapbox://styles/mapbox/streets-v12"
-      // mapStyle="mapbox://styles/mapbox/dark-v11"
       >
-        <Marker latitude={initialCoordinates[0]} longitude={initialCoordinates[1]} color="red" />
+        <Marker longitude={initialCoordinates[0]} latitude={initialCoordinates[1]} color={colors['green']['700']} />
         {drivers.map((driver) =>
           <Marker
             key={driver.driver_id}
             latitude={driver.location.latitude}
             longitude={driver.location.longitude}
-            color="green"
-            onClick={(event)=>{
+            color={colors['sky']['600']}
+            onClick={async (event) => {
               event.originalEvent.stopPropagation()
-              setPopupInfo(driver)
+              const params = new URLSearchParams({
+                coordinates: `${driver.location.longitude},${driver.location.latitude};${initialCoordinates[0]},${initialCoordinates[1]}`
+              });
+              const response = await fetch(`/api/directions?${params}`)
+              const directions = await response.json()
+              setSelectedDriver({
+                ...driver,
+                routes: directions.routes
+              })
             }}
-          />)
-        }
-        {popupInfo && (
-          <Popup
-            className='popup'
-            anchor="top"
-            longitude={Number(popupInfo.location.longitude)}
-            latitude={Number(popupInfo.location.latitude)}
-            onClose={() => setPopupInfo(null)}
           >
-            <div>
-              <p>Driver: {popupInfo.driver_id}</p>
-              <p>Coordinates: {popupInfo.location.latitude}, {popupInfo.location.longitude}</p>
-            </div>
-          </Popup>
+            <FontAwesomeIcon icon={faCarSide} size='2xl' color={colors['sky']['700']} />
+          </Marker>)
+        }
+        {selectedDriver && (
+          <>
+            <Popup
+              className='popup'
+              anchor="bottom"
+              longitude={Number(selectedDriver.location.longitude)}
+              latitude={Number(selectedDriver.location.latitude)}
+              onClose={() => setSelectedDriver(null)}
+            >
+              <div>
+                <p>Driver: {selectedDriver.driver_id}</p>
+                <p>Duration: {(selectedDriver.routes[0].duration / 60).toFixed(2)} minute(s)</p>
+              </div>
+            </Popup>
+            <Source type="geojson" lineMetrics={true} data={parseSource(selectedDriver.routes)}>
+              <Layer {...pathLayer} />
+            </Source>
+          </>
         )}
       </Map>
       <ControlPanel onCountChange={(count) => {
         setCount(Number(count))
-        setPopupInfo(null)
+        setSelectedDriver(null)
       }} />
     </div>
   );

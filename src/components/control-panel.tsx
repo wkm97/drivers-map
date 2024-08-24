@@ -14,8 +14,7 @@ export const ControlPanel = ({onCountChange}: ControlPanelProps) => {
         <form>
           <div className='p-4 flex flex-row items-center justify-center gap-4'>
             <label htmlFor="driver-count" className="block w-fit whitespace-nowrap text-sm font-medium text-sky">Count</label>
-            <Slider min={1} max={50} onChange={(e)=> onCountChange(e.target.value)}/>
-            {/* <input id="driver-count" type="range" className="w-full h-2 bg-sky-200 rounded-lg appearance-none cursor-pointer dark:bg-sky-700" /> */}
+            <Slider id="driver-count" min={1} max={50} onChange={(e)=> onCountChange(e.target.value)}/>
           </div>
         </form>
       </div>

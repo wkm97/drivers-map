@@ -1,37 +1,37 @@
-import type {LayerProps} from 'react-map-gl';
 
-export const clusterLayer: LayerProps = {
-  id: 'clusters',
-  type: 'circle',
-  source: 'earthquakes',
-  filter: ['has', 'point_count'],
-  paint: {
-    'circle-color': ['step', ['get', 'point_count'], '#51bbd6', 100, '#f1f075', 750, '#f28cb1'],
-    'circle-radius': ['step', ['get', 'point_count'], 20, 100, 30, 750, 40]
+import type { LayerProps } from 'react-map-gl';
+import colors from "tailwindcss/colors";
+
+import { Driver } from '@/index';
+
+export const parseSource = (routes: Driver['routes']) => {
+  return {
+    type: 'FeatureCollection',
+    features: routes.map(({ geometry }) => ({
+      type: 'Feature',
+      geometry,
+      properties: {}
+    }))
   }
-};
+}
 
-export const clusterCountLayer: LayerProps = {
-  id: 'cluster-count',
-  type: 'symbol',
-  source: 'earthquakes',
-  filter: ['has', 'point_count'],
+export const pathLayer: LayerProps = {
+  id: 'path',
+  type: 'line',
+  source: 'LineString',
   layout: {
-    'text-field': '{point_count_abbreviated}',
-    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-    'text-size': 12
-  }
-};
-
-export const unclusteredPointLayer: LayerProps = {
-  id: 'unclustered-point',
-  type: 'circle',
-  source: 'earthquakes',
-  filter: ['!', ['has', 'point_count']],
+    'line-cap': 'round'
+  },
   paint: {
-    'circle-color': '#11b4da',
-    'circle-radius': 4,
-    'circle-stroke-width': 1,
-    'circle-stroke-color': '#fff'
+    'line-width': 4,
+    'line-gradient': [
+      "interpolate",
+      ["linear"],
+      ["line-progress"],
+      0,
+      colors['green']['400'],
+      1,
+      colors['green']['700']
+    ],
   }
 };

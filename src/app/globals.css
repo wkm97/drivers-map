@@ -4,10 +4,10 @@
 
 @layer components {
   .popup .mapboxgl-popup-content {
-    @apply bg-gray-100
+    @apply bg-white shadow-xl
   }
   .popup .mapboxgl-popup-tip {
-    @apply border-b-gray-100 !important
+    @apply border-b-white !important
   }
   .popup .mapboxgl-popup-close-button {
     @apply px-2

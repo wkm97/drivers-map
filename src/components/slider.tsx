@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-export const Slider = ({ min, max, onChange, ...others }: React.ComponentProps<"input">) => {
+export const Slider = ({ id, min, max, onChange, ...others }: React.ComponentProps<"input">) => {
   const [value, setValue] = useState(min)
 
   const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -14,7 +14,6 @@ export const Slider = ({ min, max, onChange, ...others }: React.ComponentProps<"
   return (
     <div className='w-full flex items-center justify-center gap-2'>
       <input
-        id="driver-count"
         type="range"
         className="
           w-full bg-transparent cursor-pointer appearance-none disabled:opacity-50 disabled:pointer-events-none focus:outline-none

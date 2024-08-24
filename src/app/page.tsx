@@ -1,5 +1,5 @@
 'use client'
-import Map, { Marker } from 'react-map-gl';
+import Map, { Marker, Popup } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useEffect, useState } from 'react';
 import { ControlPanel } from '@/components/control-panel';
@@ -23,6 +23,7 @@ export default function Home() {
 
   const [drivers, setDrivers] = useState<Driver[]>([])
   const [count, setCount] = useState(1)
+  const [popupInfo, setPopupInfo] = useState<Driver | null>(null);
 
   useEffect(() => {
     const fetchDriver = async () => {
@@ -49,12 +50,40 @@ export default function Home() {
         }}
         dragRotate={false}
         mapStyle="mapbox://styles/mapbox/streets-v12"
-        // mapStyle="mapbox://styles/mapbox/dark-v11"
+      // mapStyle="mapbox://styles/mapbox/dark-v11"
       >
         <Marker latitude={initialCoordinates[0]} longitude={initialCoordinates[1]} color="red" />
-        {drivers.map(({ location, driver_id }) => <Marker key={driver_id} latitude={location.latitude} longitude={location.longitude} color="green" />)}
+        {drivers.map((driver) =>
+          <Marker
+            key={driver.driver_id}
+            latitude={driver.location.latitude}
+            longitude={driver.location.longitude}
+            color="green"
+            onClick={(event)=>{
+              event.originalEvent.stopPropagation()
+              setPopupInfo(driver)
+            }}
+          />)
+        }
+        {popupInfo && (
+          <Popup
+            className='popup'
+            anchor="top"
+            longitude={Number(popupInfo.location.longitude)}
+            latitude={Number(popupInfo.location.latitude)}
+            onClose={() => setPopupInfo(null)}
+          >
+            <div>
+              <p>Driver: {popupInfo.driver_id}</p>
+              <p>Coordinates: {popupInfo.location.latitude}, {popupInfo.location.longitude}</p>
+            </div>
+          </Popup>
+        )}
       </Map>
-      <ControlPanel onCountChange={(count)=> setCount(Number(count))}/>
+      <ControlPanel onCountChange={(count) => {
+        setCount(Number(count))
+        setPopupInfo(null)
+      }} />
     </div>
   );
 }

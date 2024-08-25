@@ -10,6 +10,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { ControlPanel } from '@/components/control-panel';
 import { parsePathData, pathLayer } from '@/mapbox/layers';
 import { Driver, Drivers } from '@/types/driver';
+import { Slider } from '@/components/slider';
 
 const initialCoordinates = [127.110, 37.394]
 
@@ -89,10 +90,15 @@ export default function Home() {
           </>
         )}
       </Map>
-      <ControlPanel onCountChange={(count) => {
-        setCount(Number(count))
-        setSelectedDriver(null)
-      }} />
+      <ControlPanel>
+        <div className='p-4 flex flex-row items-center justify-center gap-4'>
+          <label htmlFor="driver-count" className="block w-fit whitespace-nowrap text-sm font-medium text-sky">Count</label>
+          <Slider id="driver-count" min={1} max={50} onChange={(e) => {
+            setCount(Number(e.target.value))
+            setSelectedDriver(null)
+          }} />
+        </div>
+      </ControlPanel>
     </div>
   );
 }

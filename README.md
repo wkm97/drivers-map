@@ -25,7 +25,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     - A react wrapper
     - the repo/code is constantly updating
     - documentation with examples
-    - supported by Uber, Carto, Unfolded
+    - supported by [Uber](https://www.uber.com/), [Carto](https://carto.com/), [Foursquare](https://location.foursquare.com/products/studio/)
     - have some experience with deck.gl before which is also built by vis.gl
 - Tailwindcss, for css customization
     - easy to configured as it come with NextJS initial template
@@ -39,6 +39,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     - overlay on top of the map rendered with glass effect, so that it blend in well
     - position panel at bottom center so that it is easier to slide or control in mobile view, nearer to finger
     - there is only one variable to manipulate, so I arrange label and slider on the same level
+    - `ControlPanel` designed in composition pattern for more flexibility
 5. Created a slider based on the [example](https://preline.co/docs/range-slider.html#overview) found.
     - thinking of extracting the lengthy classname, but ended up colocating it at the same file for easier editing
     - just did some minor tweak like grouping the `-webkit-*` and `-moz-*`
@@ -49,9 +50,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 7. Added Popup for driver marker to display extra information.
     - noticed the `#problem` that the popup content blended in too much with the map
     - Popup content is not easily customizable, therefore `src/app/globals.css` is the workaround for it
-8. Added feature to show the path from driver to initial location
+8. Added feature to show the path from driver to initial location.
     - use mapbox direction API service
     - the URL restricted token created on step 3 is not usable, so `SECRET_MAPBOX_TOKEN` is created separately.
+    - check referer in header to mitigate requests from other party to `/api/directions` using `ALLOWED_HOST` environment variable.
     - this token is not exposed to the public
     - `#problem` with no example on implementing path layer, found the `#solution` solve it by reading the [geojson example](https://visgl.github.io/react-map-gl/examples/geojson), [linestring example](https://docs.mapbox.com/mapbox-gl-js/example/zoomto-linestring/)
     - geojson example guide me how to use Source and Layer and linestring example guide me on the geojson data properties needed by linestring layer

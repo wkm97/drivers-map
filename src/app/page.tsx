@@ -8,8 +8,8 @@ import { faCarSide } from '@fortawesome/free-solid-svg-icons';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 import { ControlPanel } from '@/components/control-panel';
-import { parseSource, pathLayer } from '@/components/layers';
-import { Driver, Drivers } from '@/index';
+import { parsePathData, pathLayer } from '@/mapbox/layers';
+import { Driver, Drivers } from '@/types/driver';
 
 const initialCoordinates = [127.110, 37.394]
 
@@ -83,7 +83,7 @@ export default function Home() {
                 <p>Duration: {(selectedDriver.routes[0].duration / 60).toFixed(2)} minute(s)</p>
               </div>
             </Popup>
-            <Source type="geojson" lineMetrics={true} data={parseSource(selectedDriver.routes)}>
+            <Source type="geojson" lineMetrics={true} data={parsePathData(selectedDriver)}>
               <Layer {...pathLayer} />
             </Source>
           </>

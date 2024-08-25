@@ -2,12 +2,12 @@
 import type { LayerProps } from 'react-map-gl';
 import colors from "tailwindcss/colors";
 
-import { Driver } from '@/index';
+import { Driver } from '@/types/driver';
 
-export const parseSource = (routes: Driver['routes']) => {
+export const parsePathData = (driver: Driver) => {
   return {
     type: 'FeatureCollection',
-    features: routes.map(({ geometry }) => ({
+    features: driver.routes.map(({ geometry }) => ({
       type: 'Feature',
       geometry,
       properties: {}
